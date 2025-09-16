@@ -18,4 +18,5 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("api/auth/me/", MeView.as_view(), name="me"),
     path("api/", include(router.urls)),
+    path('inventory/', include('inventory.urls')),
 ]
