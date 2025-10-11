@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.views import MeView, UserViewSet
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from api.views import MyTokenObtainPairView
+from api.views import MyTokenObtainPairView, ChangePasswordView, UpdateProfileView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
@@ -19,4 +19,6 @@ urlpatterns = [
     path("api/auth/me/", MeView.as_view(), name="me"),
     path("api/", include(router.urls)),
     path('inventory/', include('inventory.urls')),
+    path("change-password/", ChangePasswordView.as_view(), name="change-password"),
+    path("update-profile/", UpdateProfileView.as_view(), name="update-profile"),
 ]

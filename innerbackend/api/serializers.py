@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id", "first_name", "last_name", "username", "email",
-            "role", "contact_number", "is_active", "is_blocked", "password"
+            "role", "contact_number", "is_active", "is_blocked", "password", "profile_picture"
         ]
         read_only_fields = ["is_active", "is_blocked"]
         extra_kwargs = {
@@ -40,5 +40,20 @@ class UserCreateSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         read_only_fields = ["is_active", "is_blocked"]
 
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)
+
+    def validate_old_password(self, value):
+        user = self.context["request"].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+
+    def validate_new_password(self, value):
+        from django.contrib.auth.password_validation import validate_password
+        validate_password(value)
+        return value
 
 
