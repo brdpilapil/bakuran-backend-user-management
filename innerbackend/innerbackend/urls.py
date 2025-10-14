@@ -6,6 +6,8 @@ from api.views import MeView, UserViewSet
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from api.views import MyTokenObtainPairView, ChangePasswordView, UpdateProfileView
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
@@ -21,4 +23,8 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path("change-password/", ChangePasswordView.as_view(), name="change-password"),
     path("update-profile/", UpdateProfileView.as_view(), name="update-profile"),
+    path('menu/', include('menu.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
