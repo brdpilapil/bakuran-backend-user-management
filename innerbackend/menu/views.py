@@ -14,11 +14,11 @@ from .serializers import (
 )
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Add this line
+@permission_classes([IsAuthenticated])
 def upload_menu_image(request):
     try:
         image_data = request.data.get('image')
-        filename = request.data.get('filename', f'menu_{uuid.uuid4()}.jpg')
+        filename = request.data.get('filename', f'menu_item_{uuid.uuid4()}.jpg')
         
         if not image_data:
             return Response({'error': 'No image data provided'}, status=400)
@@ -31,6 +31,10 @@ def upload_menu_image(request):
             imgstr = image_data
             ext = 'jpg'
         
+        # Ensure filename has proper extension
+        if not filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+            filename = f"{filename}.jpg"
+        
         # Decode base64
         image_file = ContentFile(base64.b64decode(imgstr), name=filename)
         
@@ -38,11 +42,16 @@ def upload_menu_image(request):
         from django.core.files.storage import default_storage
         file_path = default_storage.save(f'menu_images/{filename}', image_file)
         
-        # For React Native app, use the request to build absolute URL
-        file_url = request.build_absolute_uri(f'/media/{file_path}')
+        # Return relative path instead of absolute URL
+        # This will be: 'media/menu_images/filename.jpg'
+        relative_url = f'/media/{file_path}'
         
-        print(f"Image uploaded: {file_url}")
-        return Response({'url': file_url})
+        print(f"Image uploaded to: {file_path}")
+        return Response({
+            'url': relative_url,
+            'file_path': file_path,
+            'filename': filename
+        })
         
     except Exception as e:
         print(f"Upload error: {str(e)}")
